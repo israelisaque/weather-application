@@ -1,39 +1,13 @@
-const APIKey = 'YBhR5fNZvhY3gX3eYVxNRWsH4t0oKkVd';
+const cityForm = document.querySelector('[data-js="change-location"]');
 
-const getCityUrl = cityName => `http://dataservice.accuweather.com/locations/v1/cities/search?apikey=${APIKey}&q=${cityName}`;
+cityForm.addEventListener('submit', async event => {
+  event.preventDefault();
 
-const getCityData = async cityName => {
-  try {
-    const cityUrl = getCityUrl(cityName);
-    const response = await fetch(cityUrl);
+  const inputValue = event.target.city.value;
+  const [{ Key, LocalizedName }] = await getCityData(inputValue);
+  const [{ WeatherText, Temperature }] = await getCityWeather(Key);
 
-    if (!response.ok) {
-      throw new Error('Não foi possível obter os dados');
-    }
+  console.log(WeatherText, Temperature.Metric.Value);
+  cityForm.reset();
 
-    const [cityData] = await response.json();
-    return cityData;
-  } catch ({ name, message }) {
-    alert(`${name}: ${message}`);
-  }
-}
-
-const getCityWeather = async cityName => {
-  try {
-    const { Key } = await getCityData(cityName);
-    const cityWeatherUrl = `http://dataservice.accuweather.com/currentconditions/v1/${Key}?apikey=${APIKey}`;
-    const response = await fetch(cityWeatherUrl);
-
-    if (!response.ok) {
-      throw new Error('Não foi possível obter os dados');
-    }
-
-    const [cityWeatherData] = await response.json();
-    debugger
-    return cityWeatherData;
-  } catch ({ name, message }) {
-    alert(`${name}: ${message}`);
-  }
-}
-
-getCityWeather('recife');
+});
